@@ -1,0 +1,495 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Noey: an automated member of your data team</title>
+<meta name="description" content="Noey connects to your databases, learns what is in them, and takes on ad-hoc requests, pipelines and dashboards. It checks its own work and asks before it changes anything. Join the early-access list.">
+<meta property="og:title" content="Noey: an automated member of your data team">
+<meta property="og:description" content="An AI data agent that answers requests, builds pipelines and dashboards, checks its own work and asks before it changes anything.">
+<meta property="og:type" content="website">
+<meta name="theme-color" content="#0b1220">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d9488'/%3E%3Cpath d='M9 23V9h2.6l7.6 9.8V9H22v14h-2.6l-7.6-9.8V23z' fill='white'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f7f8fa;
+    --surface: #ffffff;
+    --surface-2: #f0f2f5;
+    --ink: #0b1220;
+    --ink-2: #3b4556;
+    --ink-3: #6b7587;
+    --line: #e2e6ec;
+    --accent: #0d9488;
+    --accent-ink: #ffffff;
+    --accent-soft: #e6f6f4;
+    --ok: #15803d;
+    --warn-soft: #fff7e6;
+    --warn-line: #f2d49b;
+    --shadow: 0 1px 2px rgba(11,18,32,.04), 0 8px 24px rgba(11,18,32,.06);
+    --radius: 14px;
+    --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
+    --mono: "Geist Mono", ui-monospace, "SFMono-Regular", Consolas, monospace;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #0a0e15;
+      --surface: #111722;
+      --surface-2: #171f2d;
+      --ink: #e8ecf2;
+      --ink-2: #b4bccb;
+      --ink-3: #8590a3;
+      --line: #232c3b;
+      --accent: #2dd4bf;
+      --accent-ink: #062320;
+      --accent-soft: #0f2a28;
+      --ok: #4ade80;
+      --warn-soft: #2a2213;
+      --warn-line: #5c4720;
+      --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
+    }
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--sans);
+    font-size: 17px;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
+  @media (max-width: 640px) { .wrap { padding: 0 16px; } body { font-size: 16px; } }
+
+  /* Header */
+  header.site {
+    position: sticky; top: 0; z-index: 10;
+    background: color-mix(in srgb, var(--bg) 85%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  header.site .wrap { display: flex; align-items: center; justify-content: space-between; height: 64px; }
+  .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 19px; letter-spacing: -.01em; text-decoration: none; }
+  .brand-mark { width: 28px; height: 28px; border-radius: 8px; background: var(--accent); display: grid; place-items: center; }
+  .brand-mark svg { width: 16px; height: 16px; }
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    font: inherit; font-weight: 600; font-size: 15px;
+    padding: 10px 18px; border-radius: 10px; border: 1px solid transparent;
+    text-decoration: none; cursor: pointer; transition: transform .15s ease, background .15s ease;
+  }
+  .btn-primary { background: var(--accent); color: var(--accent-ink); }
+  .btn-primary:hover { transform: translateY(-1px); }
+  .btn-ghost { border-color: var(--line); background: var(--surface); color: var(--ink); }
+  .btn-ghost:hover { background: var(--surface-2); }
+
+  /* Hero */
+  .hero { padding: 88px 0 72px; }
+  .hero .wrap { display: grid; grid-template-columns: 1.05fr .95fr; gap: 56px; align-items: center; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    font-family: var(--mono); font-size: 13px; color: var(--accent);
+    background: var(--accent-soft); padding: 5px 12px; border-radius: 999px; margin-bottom: 22px;
+  }
+  .eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
+  h1 { font-size: clamp(38px, 5.4vw, 60px); line-height: 1.05; letter-spacing: -.035em; margin: 0 0 22px; font-weight: 700; }
+  .lede { font-size: 19px; color: var(--ink-2); margin: 0 0 32px; max-width: 34em; }
+  .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
+  @media (max-width: 900px) {
+    .hero { padding: 56px 0 48px; }
+    .hero .wrap { grid-template-columns: 1fr; gap: 40px; }
+  }
+
+  /* Illustrative chat card */
+  .demo {
+    background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
+    box-shadow: var(--shadow); padding: 20px; font-size: 14.5px; line-height: 1.5;
+  }
+  .demo-caption { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
+  .msg-user {
+    background: var(--surface-2); border-radius: 12px 12px 4px 12px; padding: 10px 14px;
+    margin-left: 18%; margin-bottom: 16px;
+  }
+  .steps { list-style: none; padding: 0; margin: 0 0 14px; display: grid; gap: 7px; }
+  .steps li { position: relative; padding-left: 25px; color: var(--ink-2); }
+  .steps li::before {
+    content: ""; position: absolute; left: 0; top: 2px; width: 16px; height: 16px; border-radius: 50%;
+    background: var(--ok) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.2l2.2 2.2 4.8-4.8' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat;
+  }
+  .steps code, .approval code { font-family: var(--mono); font-size: 13px; overflow-wrap: anywhere; }
+  .hero .wrap > *, .join .wrap > *, .grid > * { min-width: 0; }
+  .answer { margin: 0 0 12px; }
+  .bars { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; align-items: end; height: 84px; padding: 10px 12px 0; background: var(--surface-2); border-radius: 10px; margin-bottom: 4px; }
+  .bars span { display: block; background: var(--accent); border-radius: 4px 4px 0 0; opacity: .85; }
+  .bars span.dim { opacity: .35; }
+  .bar-labels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 0 12px; font-family: var(--mono); font-size: 11px; color: var(--ink-3); text-align: center; margin-bottom: 14px; }
+  .approval {
+    border: 1px solid var(--warn-line); background: var(--warn-soft); border-radius: 12px; padding: 12px 14px;
+    display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  }
+  .approval-text { font-size: 13.5px; }
+  .approval-text strong { display: block; font-size: 12px; font-family: var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--ink-3); font-weight: 500; }
+  .approval-btns { display: flex; gap: 6px; }
+  .chip { font-size: 12.5px; font-weight: 600; padding: 5px 11px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); }
+  .chip.go { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+
+  /* Sections */
+  section { padding: 80px 0; }
+  section.alt { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+  .section-head { max-width: 640px; margin-bottom: 44px; }
+  .kicker { font-family: var(--mono); font-size: 13px; color: var(--accent); margin-bottom: 10px; }
+  h2 { font-size: clamp(28px, 3.6vw, 40px); line-height: 1.12; letter-spacing: -.025em; margin: 0 0 14px; }
+  .section-head p { color: var(--ink-2); margin: 0; font-size: 18px; }
+  @media (max-width: 640px) { section { padding: 56px 0; } }
+
+  .grid { display: grid; gap: 18px; }
+  .grid-4 { grid-template-columns: repeat(4, 1fr); }
+  .grid-3 { grid-template-columns: repeat(3, 1fr); }
+  .grid-2 { grid-template-columns: repeat(2, 1fr); }
+  @media (max-width: 980px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } .grid-3 { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .grid-4, .grid-2 { grid-template-columns: 1fr; } }
+
+  .card { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
+  section:not(.alt) .card { background: var(--surface); }
+  .card h3 { font-size: 18px; margin: 14px 0 8px; letter-spacing: -.01em; }
+  .card p { margin: 0; color: var(--ink-2); font-size: 15.5px; }
+  .icon { width: 40px; height: 40px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
+  .icon svg { width: 21px; height: 21px; }
+
+  .step-num { font-family: var(--mono); font-size: 13px; color: var(--accent); }
+  .step h3 { font-size: 20px; margin: 6px 0 8px; }
+  .step p { color: var(--ink-2); margin: 0; font-size: 16px; }
+  .step { border-top: 2px solid var(--accent); padding-top: 18px; }
+
+  .principle { display: flex; gap: 16px; }
+  .principle .icon { flex: none; }
+  .principle h3 { margin: 0 0 6px; font-size: 18px; }
+  .principle p { margin: 0; color: var(--ink-2); font-size: 15.5px; }
+
+  /* Waitlist form */
+  .join .wrap { display: grid; grid-template-columns: .9fr 1.1fr; gap: 56px; align-items: start; }
+  @media (max-width: 900px) { .join .wrap { grid-template-columns: 1fr; gap: 32px; } }
+  .join-copy p { color: var(--ink-2); font-size: 18px; margin: 0 0 18px; }
+  .join-copy ul { margin: 0; padding-left: 20px; color: var(--ink-2); }
+  .join-copy li { margin-bottom: 6px; }
+  form.waitlist { background: var(--surface); border: 1px solid var(--line); border-radius: 18px; padding: 28px; box-shadow: var(--shadow); }
+  @media (max-width: 640px) { form.waitlist { padding: 20px; } }
+  .field { margin-bottom: 18px; }
+  .field label, .field legend { display: block; font-weight: 600; font-size: 14.5px; margin-bottom: 7px; }
+  .field .hint { font-weight: 400; color: var(--ink-3); }
+  input[type=text], input[type=email], select, textarea {
+    width: 100%; font: inherit; font-size: 15.5px; color: var(--ink);
+    background: var(--bg); border: 1px solid var(--line); border-radius: 10px; padding: 11px 13px;
+  }
+  textarea { min-height: 92px; resize: vertical; }
+  input:focus, select:focus, textarea:focus { outline: 2px solid var(--accent); outline-offset: 1px; border-color: transparent; }
+  fieldset { border: 0; padding: 0; margin: 0 0 18px; min-width: 0; }
+  .checks { display: flex; flex-wrap: wrap; gap: 8px; }
+  .checks label { display: inline-flex; align-items: center; gap: 7px; font-weight: 500; font-size: 14.5px; padding: 7px 12px; border: 1px solid var(--line); border-radius: 9px; background: var(--bg); cursor: pointer; margin: 0; }
+  .checks input { accent-color: var(--accent); margin: 0; }
+  .row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 640px) { .row-2 { grid-template-columns: 1fr; gap: 0; } }
+  .hp { position: absolute; left: -9999px; width: 1px; height: 1px; overflow: hidden; }
+  .form-note { font-size: 13.5px; color: var(--ink-3); margin: 12px 0 0; }
+  .form-status { margin-top: 14px; font-size: 15px; display: none; padding: 12px 14px; border-radius: 10px; }
+  .form-status.show { display: block; }
+  .form-status.ok { background: var(--accent-soft); color: var(--ink); }
+  .form-status.err { background: var(--warn-soft); border: 1px solid var(--warn-line); }
+  form.waitlist .btn { width: 100%; padding: 13px 18px; font-size: 16px; }
+
+  /* Build with us */
+  .build { padding: 0 0 80px; }
+  .build-card {
+    border: 1px solid var(--line); border-radius: 18px; padding: 32px;
+    background: linear-gradient(135deg, var(--accent-soft), var(--surface) 70%);
+    display: flex; gap: 24px; align-items: center; justify-content: space-between; flex-wrap: wrap;
+  }
+  .build-card h2 { font-size: 26px; margin: 0 0 6px; }
+  .build-card p { margin: 0; color: var(--ink-2); max-width: 38em; }
+
+  footer { border-top: 1px solid var(--line); padding: 28px 0; color: var(--ink-3); font-size: 14px; }
+  footer .wrap { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wrap">
+    <a class="brand" href="#top" aria-label="Noey home">
+      <span class="brand-mark" aria-hidden="true">
+        <svg viewBox="0 0 16 16"><path d="M3 13V3h1.9l5.3 6.9V3H12v10h-1.9L4.8 6.1V13z" fill="currentColor" style="color:var(--accent-ink)"/></svg>
+      </span>
+      Noey
+    </a>
+    <a class="btn btn-primary" href="#join">Join the waitlist</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <section class="hero">
+    <div class="wrap">
+      <div>
+        <div class="eyebrow">Early access</div>
+        <h1>An automated member of your data team.</h1>
+        <p class="lede">Noey connects to your databases, learns what is in them, and takes on the work your team never gets to: ad-hoc requests, pipelines and dashboards. It checks its own work, and nothing changes without your approval.</p>
+        <div class="hero-ctas">
+          <a class="btn btn-primary" href="#join">Join the waitlist</a>
+          <a class="btn btn-ghost" href="#how">See how it works</a>
+        </div>
+      </div>
+
+      <div class="demo" role="img" aria-label="Illustration: Noey answers a question about revenue retention, shows the checks it ran and a chart, and asks for approval before creating a view.">
+        <div class="demo-caption">Illustrative example</div>
+        <div class="msg-user">Why did net revenue retention drop for mid-market accounts last quarter?</div>
+        <ul class="steps">
+          <li>Found the definition of “net revenue retention” in your knowledge base</li>
+          <li>Joined <code>billing</code> on PostgreSQL with <code>accounts</code> on SQL Server</li>
+          <li>Cross-checked the total against the finance report: it matches</li>
+        </ul>
+        <p class="answer">NRR fell from 112% to 104%. Most of the drop comes from 9 accounts that downgraded after the June price change.</p>
+        <div class="bars" aria-hidden="true">
+          <span style="height:80%"></span><span style="height:84%"></span><span style="height:82%"></span>
+          <span style="height:86%"></span><span class="dim" style="height:58%"></span>
+        </div>
+        <div class="bar-labels" aria-hidden="true"><span>Q3 ’25</span><span>Q4</span><span>Q1 ’26</span><span>Q2</span><span>Q3</span></div>
+        <div class="approval">
+          <div class="approval-text"><strong>Waiting for approval</strong>Create view <code>analytics.mid_market_nrr</code> so this report updates daily?</div>
+          <div class="approval-btns" aria-hidden="true"><span class="chip">Review SQL</span><span class="chip go">Approve</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt" id="what">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">What Noey does</div>
+        <h2>Gets through the queue your data team never clears.</h2>
+        <p>Every data team has a backlog of small requests, half-built pipelines and dashboards nobody has time for. Noey takes those on, and shows its work at every step.</p>
+      </div>
+      <div class="grid grid-4">
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 10h6M9 14h4"/></svg></div>
+          <h3>Answers ad-hoc requests</h3>
+          <p>Ask in plain English. Noey finds the right tables, writes the SQL, runs it and explains how it got the answer.</p>
+        </div>
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2.2"/><circle cx="5" cy="18" r="2.2"/><circle cx="19" cy="12" r="2.2"/><path d="M7.2 6H11a3 3 0 0 1 3 3v0a3 3 0 0 0 3 3h0M7.2 18H11a3 3 0 0 0 3-3v0a3 3 0 0 1 3-3"/></svg></div>
+          <h3>Builds pipelines</h3>
+          <p>Describe the table you need. Noey designs the transformation, tests it against your data and hands it to you to approve.</p>
+        </div>
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+          <h3>Builds charts and dashboards</h3>
+          <p>Turns a question into a chart, and a set of charts into a dashboard your team can come back to.</p>
+        </div>
+        <div class="card">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="8" ry="2.8"/><path d="M4 5.5v6.5c0 1.6 3.6 2.8 8 2.8s8-1.2 8-2.8V5.5M4 12v6.5c0 1.6 3.6 2.8 8 2.8s8-1.2 8-2.8V12"/></svg></div>
+          <h3>Learns your data</h3>
+          <p>Builds a knowledge base of your servers, tables, metrics and business terms. Give it your data dictionary and it starts ahead.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="how">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">How it works</div>
+        <h2>Set it up like a new hire, not a new tool.</h2>
+        <p>Noey gets better the more it knows about your data, and you stay in charge of what it knows and what it does.</p>
+      </div>
+      <div class="grid grid-3">
+        <div class="step">
+          <div class="step-num">01</div>
+          <h3>Connect</h3>
+          <p>Add your PostgreSQL, MySQL and SQL Server servers, as many as you run. You choose which databases Noey can see.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">02</div>
+          <h3>Teach</h3>
+          <p>Noey scans your schemas and reads your data dictionary into a knowledge base. You review what it learned before it uses it.</p>
+        </div>
+        <div class="step">
+          <div class="step-num">03</div>
+          <h3>Delegate</h3>
+          <p>Ask in chat. Noey plans the work, runs it across servers, checks the result and stops for your approval before changing anything.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="alt" id="trust">
+    <div class="wrap">
+      <div class="section-head">
+        <div class="kicker">Built for sensitive data</div>
+        <h2>Your data team stays in control.</h2>
+        <p>A tool that touches production data has to earn trust. These are the rules Noey is built around.</p>
+      </div>
+      <div class="grid grid-2">
+        <div class="principle">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/></svg></div>
+          <div><h3>Nothing changes without approval</h3><p>Every change to your data is shown to you first and runs only after you approve it. If approval can't be reached, the change doesn't run.</p></div>
+        </div>
+        <div class="principle">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11l2 2 4-4"/></svg></div>
+          <div><h3>It checks its own work</h3><p>Noey validates results before it reports them, shows the queries it ran, and tells you when it isn't sure.</p></div>
+        </div>
+        <div class="principle">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
+          <!-- CONFIRM before launch: this sentence must match exactly what the desktop app does with query results. -->
+          <div><h3>Your data stays where it is</h3><p>Noey reads your data to answer you. Your data stays stored in your own systems; Noey's servers pass it to the model and don't keep it.</p></div>
+        </div>
+        <div class="principle">
+          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14 9l2 2"/></svg></div>
+          <div><h3>Your model, your key</h3><p>Use OpenAI, Anthropic or Gemini models with your own API key.</p></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="join" id="join">
+    <div class="wrap">
+      <div class="join-copy">
+        <div class="kicker">Early access</div>
+        <h2>Join the waitlist.</h2>
+        <p>We're opening Noey to a small number of data teams first, and working closely with each one. Tell us about your setup and we'll be in touch.</p>
+        <ul>
+          <li>Early access to the desktop app</li>
+          <li>A direct line to the people building it</li>
+          <li>A say in what Noey learns to do next</li>
+        </ul>
+      </div>
+
+      <form class="waitlist" id="waitlist-form" novalidate>
+        <div class="row-2">
+          <div class="field">
+            <label for="f-name">Name</label>
+            <input id="f-name" name="name" type="text" autocomplete="name" required>
+          </div>
+          <div class="field">
+            <label for="f-email">Work email</label>
+            <input id="f-email" name="email" type="email" autocomplete="email" required>
+          </div>
+        </div>
+        <div class="row-2">
+          <div class="field">
+            <label for="f-company">Company</label>
+            <input id="f-company" name="company" type="text" autocomplete="organization">
+          </div>
+          <div class="field">
+            <label for="f-role">Role</label>
+            <select id="f-role" name="role">
+              <option value="">Choose one</option>
+              <option>Data engineer</option>
+              <option>Analyst / BI</option>
+              <option>Data scientist</option>
+              <option>Data lead or manager</option>
+              <option>Founder or executive</option>
+              <option>Software engineer</option>
+              <option>Investor</option>
+              <option>Other</option>
+            </select>
+          </div>
+        </div>
+        <fieldset>
+          <legend>Databases you work with</legend>
+          <div class="checks">
+            <label><input type="checkbox" name="databases" value="PostgreSQL"> PostgreSQL</label>
+            <label><input type="checkbox" name="databases" value="MySQL"> MySQL</label>
+            <label><input type="checkbox" name="databases" value="SQL Server"> SQL Server</label>
+            <label><input type="checkbox" name="databases" value="Other"> Other</label>
+          </div>
+        </fieldset>
+        <div class="field">
+          <label for="f-first">What would you hand to Noey first? <span class="hint">(optional)</span></label>
+          <textarea id="f-first" name="first_task" placeholder="The request you get every week, the pipeline you never finished…"></textarea>
+        </div>
+        <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label></div>
+        <button class="btn btn-primary" type="submit">Join the waitlist</button>
+        <p class="form-note">We'll only use this to contact you about Noey.</p>
+        <div class="form-status" id="form-status" role="status" aria-live="polite"></div>
+      </form>
+    </div>
+  </section>
+
+  <div class="build">
+    <div class="wrap">
+      <div class="build-card">
+        <div>
+          <h2>Want to build this with us?</h2>
+          <p>We're looking for engineers who care about data systems and security to help take Noey from early product to something teams can trust with production data.</p>
+        </div>
+        <a class="btn btn-ghost" data-contact href="#">Get in touch</a>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <span>© 2026 Noey</span>
+    <a data-contact href="#">Contact</a>
+  </div>
+</footer>
+
+<script>
+  // Fill these in before going live. See README.md.
+  var CONFIG = {
+    formEndpoint: "",   // e.g. "https://formspree.io/f/abcdwxyz"
+    contactEmail: ""    // e.g. "hello@your-domain.com"
+  };
+
+  document.querySelectorAll("[data-contact]").forEach(function (a) {
+    if (CONFIG.contactEmail) a.href = "mailto:" + CONFIG.contactEmail;
+    else a.addEventListener("click", function (e) { e.preventDefault(); });
+  });
+
+  var form = document.getElementById("waitlist-form");
+  var statusEl = document.getElementById("form-status");
+
+  function showStatus(kind, text) {
+    statusEl.className = "form-status show " + kind;
+    statusEl.textContent = text;
+  }
+
+  form.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var name = form.elements.name.value.trim();
+    var email = form.elements.email.value.trim();
+    if (!name || !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
+      showStatus("err", "Please add your name and a valid email address.");
+      return;
+    }
+    if (!CONFIG.formEndpoint) {
+      showStatus("err", "The form isn't connected yet, so nothing was sent.");
+      return;
+    }
+    var button = form.querySelector("button[type=submit]");
+    button.disabled = true;
+    button.textContent = "Sending…";
+    fetch(CONFIG.formEndpoint, {
+      method: "POST",
+      body: new FormData(form),
+      headers: { "Accept": "application/json" }
+    }).then(function (res) {
+      if (!res.ok) throw new Error(res.status);
+      form.querySelectorAll(".field, fieldset, .row-2, button, .form-note").forEach(function (el) { el.style.display = "none"; });
+      showStatus("ok", "Thanks, " + name.split(" ")[0] + ". You're on the list, and we'll be in touch.");
+    }).catch(function () {
+      button.disabled = false;
+      button.textContent = "Join the waitlist";
+      showStatus("err", "Something went wrong and your details weren't sent. Please try again.");
+    });
+  });
+</script>
+</body>
+</html>
