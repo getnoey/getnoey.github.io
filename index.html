@@ -4,15 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Noey: an automated member of your data team</title>
-<meta name="description" content="Noey connects to your databases, learns what is in them, and takes on ad-hoc requests, pipelines and dashboards. It checks its own work and asks before it changes anything. Join the early-access list.">
+<meta name="description" content="Noey joins your data team with principal-level expertise, takes on requests, pipelines and dashboards, and tells you what to do next. Strategy as a service. Join the early-access waitlist.">
 <meta property="og:title" content="Noey: an automated member of your data team">
-<meta property="og:description" content="An AI data agent that answers requests, builds pipelines and dashboards, checks its own work and asks before it changes anything.">
+<meta property="og:description" content="Principal-level data expertise that learns your business, takes on the work and tells you what to do next. Strategy as a service.">
 <meta property="og:type" content="website">
-<meta name="theme-color" content="#0b1220">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230d9488'/%3E%3Cpath d='M9 23V9h2.6l7.6 9.8V9H22v14h-2.6l-7.6-9.8V23z' fill='white'/%3E%3C/svg%3E">
+<meta name="theme-color" content="#0c0d19">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%235959e8'/%3E%3Cpath d='M9 23V9h2.6l7.6 9.8V9H22v14h-2.6l-7.6-9.8V23z' fill='white'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script>document.documentElement.classList.add("js");</script>
 <style>
   :root {
     --bg: #f7f8fa;
@@ -22,12 +23,18 @@
     --ink-2: #3b4556;
     --ink-3: #6b7587;
     --line: #e2e6ec;
-    --accent: #0d9488;
-    --accent-ink: #ffffff;
-    --accent-soft: #e6f6f4;
+    --accent: oklch(0.55 0.21 277);
+    --accent-ink: oklch(0.985 0 0);
+    --accent-soft: oklch(0.955 0.022 277);
     --ok: #15803d;
     --warn-soft: #fff7e6;
     --warn-line: #f2d49b;
+    --band-bg: oklch(0.165 0.025 277);
+    --band-surface: oklch(0.215 0.032 277);
+    --band-line: oklch(0.30 0.04 277);
+    --band-ink: oklch(0.97 0.005 277);
+    --band-ink-2: oklch(0.78 0.025 277);
+    --band-accent: oklch(0.72 0.16 277);
     --shadow: 0 1px 2px rgba(11,18,32,.04), 0 8px 24px rgba(11,18,32,.06);
     --radius: 14px;
     --sans: "Geist", ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif;
@@ -42,12 +49,15 @@
       --ink-2: #b4bccb;
       --ink-3: #8590a3;
       --line: #232c3b;
-      --accent: #2dd4bf;
-      --accent-ink: #062320;
-      --accent-soft: #0f2a28;
+      --accent: oklch(0.72 0.16 277);
+      --accent-ink: oklch(0.17 0.02 277);
+      --accent-soft: oklch(0.28 0.045 277);
       --ok: #4ade80;
       --warn-soft: #2a2213;
       --warn-line: #5c4720;
+      --band-bg: oklch(0.12 0.02 277);
+      --band-surface: oklch(0.18 0.03 277);
+      --band-line: oklch(0.26 0.035 277);
       --shadow: 0 1px 2px rgba(0,0,0,.3), 0 8px 24px rgba(0,0,0,.35);
     }
   }
@@ -66,6 +76,12 @@
   a { color: inherit; }
   .wrap { max-width: 1120px; margin: 0 auto; padding: 0 24px; }
   @media (max-width: 640px) { .wrap { padding: 0 16px; } body { font-size: 16px; } }
+
+  /* Scroll reveal: content is visible without JS and for reduced motion */
+  @media (prefers-reduced-motion: no-preference) {
+    html.js .reveal { opacity: 0; transform: translateY(18px); transition: opacity .7s ease, transform .7s ease; }
+    html.js .reveal.in { opacity: 1; transform: none; }
+  }
 
   /* Header */
   header.site {
@@ -90,87 +106,176 @@
   .btn-ghost:hover { background: var(--surface-2); }
 
   /* Hero */
-  .hero { padding: 88px 0 72px; }
-  .hero .wrap { display: grid; grid-template-columns: 1.05fr .95fr; gap: 56px; align-items: center; }
+  .hero { padding: 80px 0 72px; }
+  .hero .wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 56px; align-items: center; }
   .eyebrow {
     display: inline-flex; align-items: center; gap: 8px;
     font-family: var(--mono); font-size: 13px; color: var(--accent);
     background: var(--accent-soft); padding: 5px 12px; border-radius: 999px; margin-bottom: 22px;
   }
   .eyebrow::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--accent); }
-  h1 { font-size: clamp(38px, 5.4vw, 60px); line-height: 1.05; letter-spacing: -.035em; margin: 0 0 22px; font-weight: 700; }
-  .lede { font-size: 19px; color: var(--ink-2); margin: 0 0 32px; max-width: 34em; }
+  h1 { font-size: clamp(40px, 5.6vw, 64px); line-height: 1.03; letter-spacing: -.04em; margin: 0 0 24px; font-weight: 700; }
+  h1 em { font-style: normal; color: var(--accent); }
+  .lede { font-size: 19px; color: var(--ink-2); margin: 0 0 32px; max-width: 32em; }
+  .lede strong { color: var(--ink); font-weight: 600; }
   .hero-ctas { display: flex; gap: 12px; flex-wrap: wrap; }
   @media (max-width: 900px) {
-    .hero { padding: 56px 0 48px; }
+    .hero { padding: 48px 0 48px; }
     .hero .wrap { grid-template-columns: 1fr; gap: 40px; }
   }
 
-  /* Illustrative chat card */
+  /* Hero demo: every beat holds its space from the start, so nothing jumps as it plays */
   .demo {
     background: var(--surface); border: 1px solid var(--line); border-radius: 18px;
     box-shadow: var(--shadow); padding: 20px; font-size: 14.5px; line-height: 1.5;
   }
-  .demo-caption { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 14px; }
-  .msg-user {
-    background: var(--surface-2); border-radius: 12px 12px 4px 12px; padding: 10px 14px;
-    margin-left: 18%; margin-bottom: 16px;
-  }
-  .steps { list-style: none; padding: 0; margin: 0 0 14px; display: grid; gap: 7px; }
+  .demo-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+  .demo-caption { font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); text-transform: uppercase; letter-spacing: .06em; }
+  .replay { font: inherit; font-family: var(--mono); font-size: 11.5px; color: var(--ink-3); background: none; border: 0; cursor: pointer; padding: 2px 4px; text-transform: uppercase; letter-spacing: .06em; }
+  .replay:hover { color: var(--accent); }
+  html.js .beat { opacity: 0; transform: translateY(6px); transition: opacity .45s ease, transform .45s ease; }
+  html.js .beat.on { opacity: 1; transform: none; }
+  .msg-user { background: var(--surface-2); border-radius: 12px 12px 4px 12px; padding: 10px 14px; margin-left: 16%; margin-bottom: 14px; }
+  .steps { list-style: none; padding: 0; margin: 0 0 12px; display: grid; gap: 7px; }
   .steps li { position: relative; padding-left: 25px; color: var(--ink-2); }
   .steps li::before {
     content: ""; position: absolute; left: 0; top: 2px; width: 16px; height: 16px; border-radius: 50%;
     background: var(--ok) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4.5 8.2l2.2 2.2 4.8-4.8' stroke='white' stroke-width='1.8' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") center/16px no-repeat;
   }
   .steps code, .approval code { font-family: var(--mono); font-size: 13px; overflow-wrap: anywhere; }
-  .hero .wrap > *, .join .wrap > *, .grid > * { min-width: 0; }
-  .answer { margin: 0 0 12px; }
-  .bars { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; align-items: end; height: 84px; padding: 10px 12px 0; background: var(--surface-2); border-radius: 10px; margin-bottom: 4px; }
+
+  .qcard { border: 1px solid var(--warn-line); background: var(--warn-soft); border-radius: 12px; padding: 12px 14px; margin-bottom: 12px; }
+  .qcard-title { font-weight: 600; font-size: 14px; }
+  .qcard-rule { font-size: 12.5px; color: var(--ink-3); margin: 2px 0 10px; }
+  .qtabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .qtab { font-family: var(--mono); font-size: 11.5px; padding: 3px 8px; border-radius: 6px; border: 1px solid var(--warn-line); color: var(--ink-3); }
+  .qtab.on { background: var(--surface); color: var(--ink); }
+  .qcard pre {
+    margin: 0 0 10px; padding: 10px 12px; background: var(--surface); border-radius: 8px; border: 1px solid var(--line);
+    font-family: var(--mono); font-size: 12.5px; line-height: 1.55; overflow-x: auto; max-width: 100%;
+  }
+  .qcard pre .k { color: var(--accent); font-weight: 500; }
+  .qcard pre .s { color: #b45309; }
+  @media (prefers-color-scheme: dark) { .qcard pre .s { color: #fbbf24; } }
+  .qcard-foot { display: grid; justify-items: end; }
+  .qstate { grid-area: 1 / 1; display: flex; gap: 6px; align-items: center; }
+  .qstate.done { visibility: hidden; color: var(--ok); font-weight: 600; font-size: 13.5px; }
+  .qcard.approved .qstate.pending { visibility: hidden; }
+  .qcard.approved .qstate.done { visibility: visible; }
+  .chip { font-size: 12.5px; font-weight: 600; padding: 5px 11px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); }
+  .chip.go { background: var(--accent); color: var(--accent-ink); border-color: transparent; transition: transform .15s ease; }
+  .qcard.pressing .chip.go { transform: scale(.92); }
+  .answer { margin: 0 0 10px; }
+  .bars { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; align-items: end; height: 64px; padding: 8px 12px 0; background: var(--surface-2); border-radius: 10px; margin-bottom: 4px; }
   .bars span { display: block; background: var(--accent); border-radius: 4px 4px 0 0; opacity: .85; }
   .bars span.dim { opacity: .35; }
-  .bar-labels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 0 12px; font-family: var(--mono); font-size: 11px; color: var(--ink-3); text-align: center; margin-bottom: 14px; }
-  .approval {
-    border: 1px solid var(--warn-line); background: var(--warn-soft); border-radius: 12px; padding: 12px 14px;
-    display: flex; gap: 12px; align-items: center; justify-content: space-between; flex-wrap: wrap;
-  }
-  .approval-text { font-size: 13.5px; }
-  .approval-text strong { display: block; font-size: 12px; font-family: var(--mono); text-transform: uppercase; letter-spacing: .05em; color: var(--ink-3); font-weight: 500; }
-  .approval-btns { display: flex; gap: 6px; }
-  .chip { font-size: 12.5px; font-weight: 600; padding: 5px 11px; border-radius: 8px; border: 1px solid var(--line); background: var(--surface); }
-  .chip.go { background: var(--accent); color: var(--accent-ink); border-color: transparent; }
+  .bar-labels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; padding: 0 12px; font-family: var(--mono); font-size: 11px; color: var(--ink-3); text-align: center; margin-bottom: 12px; }
+  .rec { border-left: 3px solid var(--accent); background: var(--accent-soft); border-radius: 0 10px 10px 0; padding: 10px 14px; }
+  .rec-label { font-family: var(--mono); font-size: 11.5px; text-transform: uppercase; letter-spacing: .06em; color: var(--accent); margin-bottom: 2px; }
+  .rec p { margin: 0; }
+  .rec .rec-next { color: var(--ink-2); margin-top: 6px; font-size: 13.5px; }
 
   /* Sections */
-  section { padding: 80px 0; }
+  section { padding: 96px 0; }
   section.alt { background: var(--surface); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
-  .section-head { max-width: 640px; margin-bottom: 44px; }
-  .kicker { font-family: var(--mono); font-size: 13px; color: var(--accent); margin-bottom: 10px; }
-  h2 { font-size: clamp(28px, 3.6vw, 40px); line-height: 1.12; letter-spacing: -.025em; margin: 0 0 14px; }
-  .section-head p { color: var(--ink-2); margin: 0; font-size: 18px; }
-  @media (max-width: 640px) { section { padding: 56px 0; } }
+  .section-head { max-width: 680px; margin-bottom: 48px; }
+  .kicker { font-family: var(--mono); font-size: 13px; color: var(--accent); margin-bottom: 12px; text-transform: uppercase; letter-spacing: .06em; }
+  h2 { font-size: clamp(30px, 4.2vw, 48px); line-height: 1.08; letter-spacing: -.03em; margin: 0 0 16px; }
+  .section-head p { color: var(--ink-2); margin: 0; font-size: 19px; }
+  @media (max-width: 640px) { section { padding: 64px 0; } }
 
   .grid { display: grid; gap: 18px; }
-  .grid-4 { grid-template-columns: repeat(4, 1fr); }
   .grid-3 { grid-template-columns: repeat(3, 1fr); }
   .grid-2 { grid-template-columns: repeat(2, 1fr); }
-  @media (max-width: 980px) { .grid-4 { grid-template-columns: repeat(2, 1fr); } .grid-3 { grid-template-columns: 1fr; } }
-  @media (max-width: 640px) { .grid-4, .grid-2 { grid-template-columns: 1fr; } }
+  @media (max-width: 980px) { .grid-3 { grid-template-columns: 1fr; } }
+  @media (max-width: 640px) { .grid-2 { grid-template-columns: 1fr; } }
+  .hero .wrap > *, .join .wrap > *, .meet .wrap > *, .grid > *, .track > * { min-width: 0; }
 
-  .card { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 24px; }
-  section:not(.alt) .card { background: var(--surface); }
-  .card h3 { font-size: 18px; margin: 14px 0 8px; letter-spacing: -.01em; }
-  .card p { margin: 0; color: var(--ink-2); font-size: 15.5px; }
-  .icon { width: 40px; height: 40px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
-  .icon svg { width: 21px; height: 21px; }
+  /* The problem */
+  .pains { list-style: none; margin: 0 0 40px; padding: 0; display: grid; gap: 4px; }
+  .pains li {
+    display: flex; align-items: baseline; gap: 20px;
+    font-size: clamp(24px, 3.4vw, 38px); font-weight: 600; letter-spacing: -.025em; line-height: 1.25;
+    padding: 18px 0; border-bottom: 1px solid var(--line);
+  }
+  .pains li:first-child { border-top: 1px solid var(--line); }
+  .pains .n { font-family: var(--mono); font-size: 14px; font-weight: 400; color: var(--accent); letter-spacing: 0; flex: none; }
+  .pain-close { font-size: 20px; color: var(--ink-2); max-width: 36em; margin: 0; }
+  .pain-close strong { color: var(--ink); }
 
-  .step-num { font-family: var(--mono); font-size: 13px; color: var(--accent); }
-  .step h3 { font-size: 20px; margin: 6px 0 8px; }
-  .step p { color: var(--ink-2); margin: 0; font-size: 16px; }
-  .step { border-top: 2px solid var(--accent); padding-top: 18px; }
+  /* Meet Noey */
+  .meet .wrap { display: grid; grid-template-columns: 1.1fr .9fr; gap: 56px; align-items: center; }
+  @media (max-width: 900px) { .meet .wrap { grid-template-columns: 1fr; gap: 36px; } }
+  .meet-copy p { color: var(--ink-2); font-size: 18px; margin: 0 0 16px; }
+  .meet-copy p strong { color: var(--ink); }
+  .cv { background: var(--bg); border: 1px solid var(--line); border-radius: 18px; padding: 24px; box-shadow: var(--shadow); }
+  .cv-head { display: flex; gap: 14px; align-items: center; padding-bottom: 18px; border-bottom: 1px solid var(--line); margin-bottom: 6px; }
+  .cv-avatar { width: 48px; height: 48px; border-radius: 12px; background: var(--accent); color: var(--accent-ink); display: grid; place-items: center; font-weight: 700; font-size: 22px; }
+  .cv-name { font-weight: 700; font-size: 20px; letter-spacing: -.01em; }
+  .cv-role { font-size: 14px; color: var(--ink-3); }
+  .cv dl { margin: 0; display: grid; grid-template-columns: auto 1fr; }
+  .cv dt, .cv dd { padding: 12px 0; border-bottom: 1px solid var(--line); margin: 0; }
+  .cv dt { font-family: var(--mono); font-size: 12px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-3); padding-right: 18px; padding-top: 14px; }
+  .cv dd { font-size: 15.5px; }
+  .cv dl > :nth-last-child(-n+2) { border-bottom: 0; padding-bottom: 0; }
+  @media (max-width: 420px) {
+    .cv dl { grid-template-columns: 1fr; }
+    .cv dt { border-bottom: 0; padding-bottom: 0; }
+  }
 
+  /* What it takes on */
+  .stage { background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 28px; position: relative; }
+  .stage-when { font-family: var(--mono); font-size: 13px; color: var(--accent); text-transform: uppercase; letter-spacing: .06em; }
+  .stage h3 { font-size: 26px; letter-spacing: -.02em; margin: 8px 0 10px; }
+  .stage p { margin: 0; color: var(--ink-2); font-size: 16px; }
+
+  /* Strategy as a service */
+  .band { background: var(--band-bg); color: var(--band-ink); padding: 112px 0; position: relative; overflow: hidden; }
+  .band::before {
+    content: ""; position: absolute; inset: auto -20% -60% auto; width: 70%; height: 120%;
+    background: radial-gradient(closest-side, color-mix(in srgb, var(--band-accent) 22%, transparent), transparent);
+    pointer-events: none;
+  }
+  .band .wrap { position: relative; }
+  .band .kicker { color: var(--band-accent); }
+  .band h2 { font-size: clamp(44px, 8vw, 96px); letter-spacing: -.045em; line-height: .98; margin-bottom: 24px; }
+  .band h2 em { font-style: normal; color: var(--band-accent); }
+  .band .section-head { max-width: 760px; }
+  .band .section-head p { color: var(--band-ink-2); font-size: 20px; }
+  .band .section-head p strong { color: var(--band-ink); }
+  .insight { background: var(--band-surface); border: 1px solid var(--band-line); border-radius: var(--radius); padding: 24px; }
+  .insight-tag { font-family: var(--mono); font-size: 12px; color: var(--band-accent); text-transform: uppercase; letter-spacing: .06em; margin-bottom: 12px; }
+  .insight p { margin: 0 0 12px; color: var(--band-ink-2); font-size: 15.5px; }
+  .insight p.do { color: var(--band-ink); font-weight: 600; margin: 0; font-size: 16.5px; }
+  .band-note { font-family: var(--mono); font-size: 12px; color: var(--band-ink-2); margin-top: 18px; opacity: .8; }
+
+  /* How it grows */
+  .track { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; position: relative; }
+  .track::before { content: ""; position: absolute; top: 9px; left: 10px; right: 10px; height: 2px; background: linear-gradient(90deg, var(--line), var(--accent)); }
+  .milestone { position: relative; padding-top: 38px; }
+  .milestone::before {
+    content: ""; position: absolute; top: 0; left: 0; width: 20px; height: 20px; border-radius: 50%;
+    background: var(--surface); border: 2px solid var(--accent);
+  }
+  .milestone:nth-child(2)::before { background: color-mix(in srgb, var(--accent) 35%, var(--surface)); }
+  .milestone:nth-child(3)::before { background: color-mix(in srgb, var(--accent) 70%, var(--surface)); }
+  .milestone:nth-child(4)::before { background: var(--accent); box-shadow: 0 0 0 6px var(--accent-soft); }
+  .milestone h3 { font-size: 22px; letter-spacing: -.02em; margin: 0 0 8px; }
+  .milestone p { margin: 0; color: var(--ink-2); font-size: 15.5px; }
+  @media (max-width: 900px) {
+    .track { grid-template-columns: 1fr; gap: 28px; padding-left: 4px; }
+    .track::before { top: 10px; bottom: 10px; left: 13px; right: auto; width: 2px; height: auto; background: linear-gradient(180deg, var(--line), var(--accent)); }
+    .milestone { padding-top: 0; padding-left: 40px; }
+    .milestone::before { left: 0; top: 4px; }
+  }
+
+  /* Your rules */
   .principle { display: flex; gap: 16px; }
   .principle .icon { flex: none; }
   .principle h3 { margin: 0 0 6px; font-size: 18px; }
   .principle p { margin: 0; color: var(--ink-2); font-size: 15.5px; }
+  .icon { width: 40px; height: 40px; border-radius: 10px; background: var(--accent-soft); color: var(--accent); display: grid; place-items: center; }
+  .icon svg { width: 21px; height: 21px; }
 
   /* Waitlist form */
   .join .wrap { display: grid; grid-template-columns: .9fr 1.1fr; gap: 56px; align-items: start; }
@@ -204,13 +309,13 @@
   form.waitlist .btn { width: 100%; padding: 13px 18px; font-size: 16px; }
 
   /* Build with us */
-  .build { padding: 0 0 80px; }
+  .build { padding: 0 0 96px; }
   .build-card {
     border: 1px solid var(--line); border-radius: 18px; padding: 32px;
     background: linear-gradient(135deg, var(--accent-soft), var(--surface) 70%);
     display: flex; gap: 24px; align-items: center; justify-content: space-between; flex-wrap: wrap;
   }
-  .build-card h2 { font-size: 26px; margin: 0 0 6px; }
+  .build-card h2 { font-size: 28px; margin: 0 0 6px; }
   .build-card p { margin: 0; color: var(--ink-2); max-width: 38em; }
 
   footer { border-top: 1px solid var(--line); padding: 28px 0; color: var(--ink-3); font-size: 14px; }
@@ -233,138 +338,242 @@
 
 <main id="top">
 
+  <!-- 1. Hook -->
   <section class="hero">
     <div class="wrap">
       <div>
-        <div class="eyebrow">Early access</div>
-        <h1>An automated member of your data team.</h1>
-        <p class="lede">Noey connects to your databases, learns what is in them, and takes on the work your team never gets to: ad-hoc requests, pipelines and dashboards. It checks its own work, and nothing changes without your approval.</p>
+        <div class="eyebrow">Early access · Now onboarding data teams</div>
+        <h1>An automated member of your <em>data team.</em></h1>
+        <p class="lede">Noey joins with the expertise of a <strong>principal data professional</strong>. It learns your systems like any new hire, then takes on the work: requests, pipelines, dashboards. And it doesn't stop at the answer. <strong>It tells you what to do next.</strong></p>
         <div class="hero-ctas">
           <a class="btn btn-primary" href="#join">Join the waitlist</a>
-          <a class="btn btn-ghost" href="#how">See how it works</a>
+          <a class="btn btn-ghost" href="#problem">See why</a>
         </div>
       </div>
 
-      <div class="demo" role="img" aria-label="Illustration: Noey answers a question about revenue retention, shows the checks it ran and a chart, and asks for approval before creating a view.">
-        <div class="demo-caption">Illustrative example</div>
-        <div class="msg-user">Why did net revenue retention drop for mid-market accounts last quarter?</div>
+      <div class="demo" id="demo" role="img" aria-label="Illustration: asked why revenue retention dropped, Noey looks up the metric in its knowledge base, asks the user to approve two queries, runs them across PostgreSQL and SQL Server, checks the result, answers with a chart and recommends what to do next.">
+        <div class="demo-top">
+          <span class="demo-caption">Illustrative example</span>
+          <button class="replay" id="replay" type="button" hidden>↻ Replay</button>
+        </div>
+
+        <div class="msg-user beat" data-at="200">Why did net revenue retention drop for mid-market accounts last quarter?</div>
+
         <ul class="steps">
-          <li>Found the definition of “net revenue retention” in your knowledge base</li>
-          <li>Joined <code>billing</code> on PostgreSQL with <code>accounts</code> on SQL Server</li>
-          <li>Cross-checked the total against the finance report: it matches</li>
+          <li class="beat" data-at="1100">Found how your team defines “net revenue retention” in the knowledge base</li>
         </ul>
-        <p class="answer">NRR fell from 112% to 104%. Most of the drop comes from 9 accounts that downgraded after the June price change.</p>
-        <div class="bars" aria-hidden="true">
-          <span style="height:80%"></span><span style="height:84%"></span><span style="height:82%"></span>
-          <span style="height:86%"></span><span class="dim" style="height:58%"></span>
+
+        <div class="qcard beat" id="qcard" data-at="2000">
+          <div class="qcard-title">Approve 2 queries before I run them?</div>
+          <div class="qcard-rule">Your rule: ask before any query on production</div>
+          <div class="qtabs"><span class="qtab on">pg-prod · billing</span><span class="qtab">crm · accounts</span></div>
+<pre><code><span class="k">SELECT</span> account_id,
+       date_trunc(<span class="s">'quarter'</span>, paid_at) <span class="k">AS</span> quarter,
+       sum(amount) <span class="k">AS</span> revenue
+<span class="k">FROM</span> billing.invoices
+<span class="k">WHERE</span> paid_at &gt;= <span class="s">'2025-07-01'</span>
+<span class="k">GROUP BY</span> 1, 2;</code></pre>
+          <div class="qcard-foot">
+            <div class="qstate pending"><span class="chip">Edit</span><span class="chip go">Approve</span></div>
+            <div class="qstate done">✓ Approved by you</div>
+          </div>
         </div>
-        <div class="bar-labels" aria-hidden="true"><span>Q3 ’25</span><span>Q4</span><span>Q1 ’26</span><span>Q2</span><span>Q3</span></div>
-        <div class="approval">
-          <div class="approval-text"><strong>Waiting for approval</strong>Create view <code>analytics.mid_market_nrr</code> so this report updates daily?</div>
-          <div class="approval-btns" aria-hidden="true"><span class="chip">Review SQL</span><span class="chip go">Approve</span></div>
+
+        <ul class="steps">
+          <li class="beat" data-at="4700">Joined <code>billing</code> on PostgreSQL with <code>accounts</code> on SQL Server</li>
+          <li class="beat" data-at="5400">Cross-checked the total against the finance report: it matches</li>
+        </ul>
+
+        <p class="answer beat" data-at="6300">NRR fell from 112% to 104%. Most of the drop comes from 9 accounts that downgraded after the June price change.</p>
+        <div class="beat" data-at="6900">
+          <div class="bars" aria-hidden="true">
+            <span style="height:80%"></span><span style="height:84%"></span><span style="height:82%"></span>
+            <span style="height:86%"></span><span class="dim" style="height:58%"></span>
+          </div>
+          <div class="bar-labels" aria-hidden="true"><span>Q3 ’25</span><span>Q4</span><span>Q1 ’26</span><span>Q2</span><span>Q3</span></div>
+        </div>
+
+        <div class="rec beat" data-at="7900">
+          <div class="rec-label">What I'd do</div>
+          <p>Offer those 9 accounts their old tier for two quarters. That should win back about 5 points of NRR.</p>
+          <p class="rec-next">Want this report in your inbox every Monday?</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="alt" id="what">
+  <!-- 2. Tension -->
+  <section class="alt" id="problem">
     <div class="wrap">
-      <div class="section-head">
-        <div class="kicker">What Noey does</div>
-        <h2>Gets through the queue your data team never clears.</h2>
-        <p>Every data team has a backlog of small requests, half-built pipelines and dashboards nobody has time for. Noey takes those on, and shows its work at every step.</p>
+      <div class="section-head reveal">
+        <div class="kicker">The problem</div>
+        <h2>Your data team is stuck answering yesterday's questions.</h2>
       </div>
-      <div class="grid grid-4">
-        <div class="card">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/><path d="M9 10h6M9 14h4"/></svg></div>
-          <h3>Answers ad-hoc requests</h3>
-          <p>Ask in plain English. Noey finds the right tables, writes the SQL, runs it and explains how it got the answer.</p>
+      <ul class="pains">
+        <li class="reveal"><span class="n">01</span>The request queue never empties.</li>
+        <li class="reveal"><span class="n">02</span>The pipeline is always half-built.</li>
+        <li class="reveal"><span class="n">03</span>The strategy work never starts.</li>
+      </ul>
+      <p class="pain-close reveal">Every company has more questions than its data team has hours. So the urgent beats the important, week after week. <strong>What if your team had one more member, one who never runs out of hours?</strong></p>
+    </div>
+  </section>
+
+  <!-- 3. Meet Noey -->
+  <section class="meet" id="meet">
+    <div class="wrap">
+      <div class="meet-copy reveal">
+        <div class="kicker">Meet Noey</div>
+        <h2>It arrives an expert. It becomes <em style="font-style:normal;color:var(--accent)">your</em> expert.</h2>
+        <p>Noey brings the know-how of a <strong>principal data engineer, analyst and scientist</strong>, built on today's most capable AI models.</p>
+        <p>Like any new hire, it starts by learning how your business works. It reads your schemas and your data dictionary, and asks when something isn't clear.</p>
+        <p>Unlike any new hire, <strong>it never forgets what it learns</strong>, and it gets sharper every time you use it.</p>
+      </div>
+
+      <div class="cv reveal" aria-label="Noey's profile, written as a CV">
+        <div class="cv-head">
+          <div class="cv-avatar" aria-hidden="true">N</div>
+          <div>
+            <div class="cv-name">Noey</div>
+            <div class="cv-role">Data team member · Automated</div>
+          </div>
         </div>
-        <div class="card">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="5" cy="6" r="2.2"/><circle cx="5" cy="18" r="2.2"/><circle cx="19" cy="12" r="2.2"/><path d="M7.2 6H11a3 3 0 0 1 3 3v0a3 3 0 0 0 3 3h0M7.2 18H11a3 3 0 0 0 3-3v0a3 3 0 0 1 3-3"/></svg></div>
-          <h3>Builds pipelines</h3>
-          <p>Describe the table you need. Noey designs the transformation, tests it against your data and hands it to you to approve.</p>
-        </div>
-        <div class="card">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
-          <h3>Builds charts and dashboards</h3>
-          <p>Turns a question into a chart, and a set of charts into a dashboard your team can come back to.</p>
-        </div>
-        <div class="card">
-          <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="8" ry="2.8"/><path d="M4 5.5v6.5c0 1.6 3.6 2.8 8 2.8s8-1.2 8-2.8V5.5M4 12v6.5c0 1.6 3.6 2.8 8 2.8s8-1.2 8-2.8V12"/></svg></div>
-          <h3>Learns your data</h3>
-          <p>Builds a knowledge base of your servers, tables, metrics and business terms. Give it your data dictionary and it starts ahead.</p>
-        </div>
+        <dl>
+          <dt>Experience</dt><dd>Principal level, across data engineering, analytics and data science</dd>
+          <dt>Fluent in</dt><dd>SQL on PostgreSQL, MySQL and SQL Server, across as many servers as you run</dd>
+          <dt>First week</dt><dd>Reads every schema and your data dictionary. Asks good questions.</dd>
+          <dt>Hours</dt><dd>Nights, weekends and Monday mornings</dd>
+          <dt>Weakness</dt><dd>Doesn't know your business yet. It's a fast learner.</dd>
+        </dl>
       </div>
     </div>
   </section>
 
-  <section id="how">
+  <!-- 4. The work -->
+  <section class="alt" id="work">
     <div class="wrap">
-      <div class="section-head">
-        <div class="kicker">How it works</div>
-        <h2>Set it up like a new hire, not a new tool.</h2>
-        <p>Noey gets better the more it knows about your data, and you stay in charge of what it knows and what it does.</p>
+      <div class="section-head reveal">
+        <div class="kicker">What it takes on</div>
+        <h2>It starts with a question. It doesn't stop there.</h2>
       </div>
       <div class="grid grid-3">
-        <div class="step">
-          <div class="step-num">01</div>
-          <h3>Connect</h3>
-          <p>Add your PostgreSQL, MySQL and SQL Server servers, as many as you run. You choose which databases Noey can see.</p>
+        <div class="stage reveal">
+          <div class="stage-when">First</div>
+          <h3>It answers.</h3>
+          <p>Ask in plain English. Get a checked answer, with the SQL and the reasoning behind it, in minutes instead of a ticket queue.</p>
         </div>
-        <div class="step">
-          <div class="step-num">02</div>
-          <h3>Teach</h3>
-          <p>Noey scans your schemas and reads your data dictionary into a knowledge base. You review what it learned before it uses it.</p>
+        <div class="stage reveal">
+          <div class="stage-when">Then</div>
+          <h3>It builds.</h3>
+          <p>The pipeline behind the question. Noey designs it, tests it against your data and ships it the moment you approve.</p>
         </div>
-        <div class="step">
-          <div class="step-num">03</div>
-          <h3>Delegate</h3>
-          <p>Ask in chat. Noey plans the work, runs it across servers, checks the result and stops for your approval before changing anything.</p>
+        <div class="stage reveal">
+          <div class="stage-when">Then</div>
+          <h3>It keeps answering.</h3>
+          <p>Charts and dashboards that stay current, so nobody has to ask the same question twice.</p>
         </div>
       </div>
     </div>
   </section>
 
-  <section class="alt" id="trust">
+  <!-- 5. The peak -->
+  <section class="band" id="strategy">
     <div class="wrap">
-      <div class="section-head">
-        <div class="kicker">Built for sensitive data</div>
-        <h2>Your data team stays in control.</h2>
-        <p>A tool that touches production data has to earn trust. These are the rules Noey is built around.</p>
+      <div class="section-head reveal">
+        <div class="kicker">And then</div>
+        <h2>Strategy<br>as a <em>service.</em></h2>
+        <p>Most data tools stop at the answer. Noey keeps going: what changed, why it changed and what to do about it. <strong>You get a decision, not just a dashboard.</strong></p>
+      </div>
+      <div class="grid grid-3">
+        <div class="insight reveal">
+          <div class="insight-tag">Revenue</div>
+          <p>Net revenue retention fell 8 points. Nine accounts downgraded after the June price change.</p>
+          <p class="do">Offer them their old tier for two quarters.</p>
+        </div>
+        <div class="insight reveal">
+          <div class="insight-tag">Definitions</div>
+          <p>Finance and product count churn differently, so their reports never agree.</p>
+          <p class="do">Adopt one definition. Here are the 14 reports it changes.</p>
+        </div>
+        <div class="insight reveal">
+          <div class="insight-tag">Data platform</div>
+          <p>Three pipelines rebuild the same table every night.</p>
+          <p class="do">Merge them and cut 40 minutes of warehouse time a day.</p>
+        </div>
+      </div>
+      <div class="band-note reveal">Illustrative examples</div>
+    </div>
+  </section>
+
+  <!-- 6. How it grows -->
+  <section id="grows">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="kicker">Over time</div>
+        <h2>The longer it works with you, the more it takes on.</h2>
+        <p>Every question teaches it something about your business. That knowledge stays, and it compounds.</p>
+      </div>
+      <div class="track">
+        <div class="milestone reveal">
+          <h3>Hired</h3>
+          <p>Knows data inside out. Reads your schemas and data dictionary on day one.</p>
+        </div>
+        <div class="milestone reveal">
+          <h3>Onboarded</h3>
+          <p>Knows your metrics, your business terms and which tables to trust.</p>
+        </div>
+        <div class="milestone reveal">
+          <h3>Trusted</h3>
+          <p>Runs your recurring reports and the pipelines behind them.</p>
+        </div>
+        <div class="milestone reveal">
+          <h3>Indispensable</h3>
+          <p>Brings you what changed, and what to do about it, before anyone asks.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7. Trust -->
+  <section class="alt" id="control">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <div class="kicker">On your terms</div>
+        <h2>All that expertise. Your rules.</h2>
+        <p>A teammate this capable should work exactly the way you want. With Noey, you decide.</p>
       </div>
       <div class="grid grid-2">
-        <div class="principle">
+        <div class="principle reveal">
           <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12l2 2 4-4"/><path d="M12 3l8 3v6c0 4.5-3.4 8.2-8 9-4.6-.8-8-4.5-8-9V6z"/></svg></div>
-          <div><h3>Nothing changes without approval</h3><p>Every change to your data is shown to you first and runs only after you approve it. If approval can't be reached, the change doesn't run.</p></div>
+          <div><h3>You set the approvals</h3><p>Choose what needs your sign-off, from every change to every single query. Noey shows you exactly what it will run, then waits. If it can't reach you, it doesn't act.</p></div>
         </div>
-        <div class="principle">
+        <div class="principle reveal">
           <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3M8 11l2 2 4-4"/></svg></div>
-          <div><h3>It checks its own work</h3><p>Noey validates results before it reports them, shows the queries it ran, and tells you when it isn't sure.</p></div>
+          <div><h3>It shows its work</h3><p>Every answer comes with the queries behind it and the checks it ran. When it isn't sure, it says so.</p></div>
         </div>
-        <div class="principle">
+        <div class="principle reveal">
           <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></svg></div>
           <!-- CONFIRM before launch: this sentence must match exactly what the desktop app does with query results. -->
           <div><h3>Your data stays where it is</h3><p>Noey reads your data to answer you. Your data stays stored in your own systems; Noey's servers pass it to the model and don't keep it.</p></div>
         </div>
-        <div class="principle">
+        <div class="principle reveal">
           <div class="icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="8" cy="15" r="4"/><path d="M11 12l9-9M17 6l3 3M14 9l2 2"/></svg></div>
-          <div><h3>Your model, your key</h3><p>Use OpenAI, Anthropic or Gemini models with your own API key.</p></div>
+          <div><h3>Your models, your keys</h3><p>Runs on frontier models from OpenAI, Anthropic and Google, with your own API key.</p></div>
         </div>
       </div>
     </div>
   </section>
 
+  <!-- 8. The ask -->
   <section class="join" id="join">
     <div class="wrap">
-      <div class="join-copy">
+      <div class="join-copy reveal">
         <div class="kicker">Early access</div>
-        <h2>Join the waitlist.</h2>
-        <p>We're opening Noey to a small number of data teams first, and working closely with each one. Tell us about your setup and we'll be in touch.</p>
+        <h2>Be one of the first teams to hire Noey.</h2>
+        <p>We're onboarding a small group of data teams first, and working closely with each one. Join the list and help shape what Noey learns next.</p>
         <ul>
           <li>Early access to the desktop app</li>
           <li>A direct line to the people building it</li>
-          <li>A say in what Noey learns to do next</li>
+          <li>A say in what Noey takes on next</li>
         </ul>
       </div>
 
@@ -409,8 +618,8 @@
           </div>
         </fieldset>
         <div class="field">
-          <label for="f-first">What would you hand to Noey first? <span class="hint">(optional)</span></label>
-          <textarea id="f-first" name="first_task" placeholder="The request you get every week, the pipeline you never finished…"></textarea>
+          <label for="f-first">What's the first thing you'd hand to Noey? <span class="hint">(optional)</span></label>
+          <textarea id="f-first" name="first_task" placeholder="The request you get every week, the pipeline you never finished, the question nobody has time to answer…"></textarea>
         </div>
         <div class="hp" aria-hidden="true"><label>Leave this empty <input type="text" name="_gotcha" tabindex="-1" autocomplete="off"></label></div>
         <button class="btn btn-primary" type="submit">Join the waitlist</button>
@@ -422,10 +631,10 @@
 
   <div class="build">
     <div class="wrap">
-      <div class="build-card">
+      <div class="build-card reveal">
         <div>
-          <h2>Want to build this with us?</h2>
-          <p>We're looking for engineers who care about data systems and security to help take Noey from early product to something teams can trust with production data.</p>
+          <h2>Want to build Noey with us?</h2>
+          <p>We're looking for engineers who care about data systems and security. If building the teammate every data team will want sounds like your kind of problem, get in touch.</p>
         </div>
         <a class="btn btn-ghost" data-contact href="#">Get in touch</a>
       </div>
@@ -447,6 +656,62 @@
     formEndpoint: "https://formspree.io/f/xoejjegw",
     contactEmail: "noeyhq@gmail.com"
   };
+
+  var reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Hero demo: reveal each beat on its own schedule, approve the queries, then offer a replay.
+  (function () {
+    var demo = document.getElementById("demo");
+    var qcard = document.getElementById("qcard");
+    var replay = document.getElementById("replay");
+    var beats = demo.querySelectorAll(".beat");
+    var timers = [];
+    var APPROVE_AT = 3900, END_AT = 8600;
+
+    function later(fn, ms) { timers.push(setTimeout(fn, ms)); }
+
+    function showAll() {
+      beats.forEach(function (b) { b.classList.add("on"); });
+      qcard.classList.add("approved");
+    }
+
+    function play() {
+      timers.forEach(clearTimeout);
+      timers = [];
+      replay.hidden = true;
+      qcard.classList.remove("approved", "pressing");
+      beats.forEach(function (b) {
+        b.classList.remove("on");
+        later(function () { b.classList.add("on"); }, Number(b.getAttribute("data-at")) || 0);
+      });
+      later(function () { qcard.classList.add("pressing"); }, APPROVE_AT - 250);
+      later(function () { qcard.classList.remove("pressing"); qcard.classList.add("approved"); }, APPROVE_AT);
+      later(function () { replay.hidden = false; }, END_AT);
+    }
+
+    replay.addEventListener("click", play);
+    if (reduceMotion) showAll(); else later(play, 400);
+  })();
+
+  // Fade sections in as they scroll into view.
+  (function () {
+    var items = document.querySelectorAll(".reveal");
+    if (reduceMotion || !("IntersectionObserver" in window)) {
+      items.forEach(function (el) { el.classList.add("in"); });
+      return;
+    }
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) { e.target.classList.add("in"); io.unobserve(e.target); }
+      });
+    }, { rootMargin: "0px 0px -8% 0px", threshold: 0.12 });
+    // Siblings that arrive together (cards, milestones) come in one after another.
+    items.forEach(function (el) {
+      var siblings = Array.prototype.filter.call(el.parentElement.children, function (c) { return c.classList.contains("reveal"); });
+      el.style.transitionDelay = (siblings.indexOf(el) % 4) * 90 + "ms";
+      io.observe(el);
+    });
+  })();
 
   document.querySelectorAll("[data-contact]").forEach(function (a) {
     if (CONFIG.contactEmail) a.href = "mailto:" + CONFIG.contactEmail;
